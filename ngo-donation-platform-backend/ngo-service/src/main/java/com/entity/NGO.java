@@ -1,7 +1,6 @@
 package com.entity;
 
 import jakarta.persistence.*;
-
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -24,13 +23,14 @@ public class NGO {
     @Column(nullable = false)
     private String address;
 
-    @Column(nullable = false,length = 1000)
+    @Column(nullable = false, length = 1000)
     private String description;
 
+    // ✅ Store raw images in DB (BLOBs)
     @ElementCollection
-    @CollectionTable(name="ngo_images",joinColumns = @JoinColumn(name="ngo_id"))
-    @Column(name="image_url")
-    private Set<String> imageUrls = new HashSet<>();
+    @CollectionTable(name = "ngo_images", joinColumns = @JoinColumn(name = "ngo_id"))
+    @Column(name = "image_data", columnDefinition = "LONGBLOB")  // Use BLOB/LONGBLOB
+    private Set<byte[]> images = new HashSet<>();
 
     private Double locationLat;
     private Double locationLng;
@@ -38,16 +38,14 @@ public class NGO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-
+    // Getters & Setters
     public long getId() {
         return id;
     }
 
-
     public String getName() {
         return name;
     }
-
     public void setName(String name) {
         this.name = name;
     }
@@ -55,7 +53,6 @@ public class NGO {
     public String getPhoneNumber() {
         return phoneNumber;
     }
-
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
@@ -63,7 +60,6 @@ public class NGO {
     public String getEmail() {
         return email;
     }
-
     public void setEmail(String email) {
         this.email = email;
     }
@@ -71,7 +67,6 @@ public class NGO {
     public String getAddress() {
         return address;
     }
-
     public void setAddress(String address) {
         this.address = address;
     }
@@ -79,23 +74,20 @@ public class NGO {
     public String getDescription() {
         return description;
     }
-
     public void setDescription(String description) {
         this.description = description;
     }
 
-    public Set<String> getImageUrls() {
-        return imageUrls;
+    public Set<byte[]> getImages() {
+        return images;
     }
-
-    public void setImageUrls(Set<String> imageUrls) {
-        this.imageUrls = imageUrls;
+    public void setImages(Set<byte[]> images) {
+        this.images = images;
     }
 
     public Double getLocationLat() {
         return locationLat;
     }
-
     public void setLocationLat(Double locationLat) {
         this.locationLat = locationLat;
     }
@@ -103,7 +95,6 @@ public class NGO {
     public Double getLocationLng() {
         return locationLng;
     }
-
     public void setLocationLng(Double locationLng) {
         this.locationLng = locationLng;
     }
@@ -111,8 +102,9 @@ public class NGO {
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
+
     @PrePersist
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void onCreate() {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
@@ -120,8 +112,9 @@ public class NGO {
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }
+
     @PreUpdate
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
+    public void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
     }
 }
