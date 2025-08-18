@@ -2,6 +2,7 @@ package com.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -38,8 +39,9 @@ public class Donation {
     private String itemName;
     private String itemDescription;
 
-    @ElementCollection
-    private List<String> imageUrls; // Store multiple image URLs (or file paths)
+    @OneToMany(mappedBy = "donation", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<DonationImage> images = new ArrayList<>();
+
 
     private LocalDate createdAt;
     private LocalDate updatedAt;
@@ -134,12 +136,12 @@ public class Donation {
         this.itemDescription = itemDescription;
     }
 
-    public List<String> getImageUrls() {
-        return imageUrls;
+    public List<DonationImage> getImages() {
+        return images;
     }
 
-    public void setImageUrls(List<String> imageUrls) {
-        this.imageUrls = imageUrls;
+    public void setImageUrls(List<DonationImage> images) {
+        this.images = images;
     }
 
     public LocalDate getCreatedAt() {
