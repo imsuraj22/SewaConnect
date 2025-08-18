@@ -1,35 +1,56 @@
 package com.entity;
 
 import jakarta.persistence.*;
-
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
+@Table(name = "users")
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @Column(unique = true, nullable = false)
     private String username;
+
     @Column(unique = true, nullable = false)
     private String email;
-    @Column( nullable = false)
+
+    @Column(nullable = false)
     private String password;
-    @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
-    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
+
+    @ElementCollection(fetch = FetchType.EAGER, targetClass = Role.class)
+    @CollectionTable(
+            name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id")
+    )
     @Column(name = "role")
     @Enumerated(EnumType.STRING)
-    private Set<Role> roles=new HashSet<>();
-    @Column( nullable = false)
+    private Set<Role> roles = new HashSet<>();
+
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    public User(){
+    private LocalDateTime updatedAt;
 
+    public User() {}
+
+    // 🔹 Auto-set timestamps
+    @PrePersist
+    public void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
+
+    @PreUpdate
+    public void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    // Getters and Setters
     public long getId() {
         return id;
     }
@@ -69,8 +90,8 @@ public class User {
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
-    @PrePersist
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
     }
 }
