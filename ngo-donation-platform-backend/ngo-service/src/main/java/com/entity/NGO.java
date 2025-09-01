@@ -17,14 +17,31 @@ public class NGO {
     @Column(unique = true, nullable = false)
     private String email;
 
+
+
+    @Column(nullable = false)
+    private String password;
+
     @Column(unique = true, nullable = false)
     private String phoneNumber;
 
-    @Column(nullable = false)
+
     private String address;
 
-    @Column(nullable = false, length = 1000)
+    @Column( length = 1000)
     private String description;
+
+    @Column(nullable = false)
+    private boolean active = true;
+
+
+
+    @Enumerated(EnumType.STRING)
+    private NGOStatus status = NGOStatus.PENDING;
+
+    @OneToMany(mappedBy = "ngo", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<NGODocument> documents = new HashSet<>();
+
 
     // ✅ Store raw images in DB (BLOBs)
     @ElementCollection
@@ -49,11 +66,19 @@ public class NGO {
     public void setName(String name) {
         this.name = name;
     }
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
     public String getPhoneNumber() {
         return phoneNumber;
     }
     public void setPhoneNumber(String phoneNumber) {
+
         this.phoneNumber = phoneNumber;
     }
 
@@ -62,6 +87,14 @@ public class NGO {
     }
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public NGOStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(NGOStatus status) {
+        this.status = status;
     }
 
     public String getAddress() {
@@ -77,6 +110,24 @@ public class NGO {
     public void setDescription(String description) {
         this.description = description;
     }
+
+
+    public Set<NGODocument> getDocuments() {
+        return documents;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public void setDocuments(Set<NGODocument> documents) {
+        this.documents = documents;
+    }
+
 
     public Set<byte[]> getImages() {
         return images;
