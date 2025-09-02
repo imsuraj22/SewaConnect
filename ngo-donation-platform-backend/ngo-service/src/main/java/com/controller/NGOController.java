@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
+import com.entity.Package;
 
 @RestController
 @RequestMapping("/api/ngos")
@@ -23,14 +24,15 @@ public class NGOController {
         this.ngoService = ngoService;
     }
 
-    // ✅ Register NGO (minimal fields: name, email, phone, password)
-    @PostMapping("/register")
-    public ResponseEntity<NGO> registerNGO(@RequestBody NGO ngo) {
-        NGO saved = ngoService.registerNGO(ngo);
+    // ✅ Register NGO (linked with an existing User by userId)
+    @PostMapping("/register/{userId}")
+    public ResponseEntity<NGO> registerNGO(
+            @PathVariable Long userId) {
+        NGO saved = ngoService.registerNGO(userId);
         return new ResponseEntity<>(saved, HttpStatus.CREATED);
     }
 
-    // ✅ Add one or multiple documents
+    // ✅ Upload documents (multiple allowed)
     @PostMapping("/{ngoId}/documents")
     public ResponseEntity<Set<NGODocument>> uploadDocuments(
             @PathVariable Long ngoId,
@@ -39,31 +41,43 @@ public class NGOController {
         return ResponseEntity.ok(uploadedDocs);
     }
 
-    // ✅ Update NGO profile
+    // ✅ Update NGO profile (address, description, location, images, etc.)
     @PutMapping("/{ngoId}")
-    public ResponseEntity<NGO> updateNGO(@PathVariable Long ngoId, @RequestBody NGO updatedData) {
+    public ResponseEntity<NGO> updateNGO(
+            @PathVariable Long ngoId,
+            @RequestBody NGO updatedData) {
         NGO updatedNGO = ngoService.updateNGO(ngoId, updatedData);
         return ResponseEntity.ok(updatedNGO);
     }
 
-    // ✅ Soft Delete NGO
+    // ✅ Soft Delete NGO (mark as DEACTIVATED)
     @DeleteMapping("/{ngoId}")
     public ResponseEntity<String> deleteNGO(@PathVariable Long ngoId) {
-        ngoService.deleteNGO(ngoId);
-        return ResponseEntity.ok("NGO soft deleted successfully.");
+        ngoService.deactivateNGO(ngoId);
+        return ResponseEntity.ok("NGO has been deactivated successfully.");
     }
 
-    // ✅ Get NGO by ID
+
+//    // ✅ Get NGO by ID
     @GetMapping("/{ngoId}")
     public ResponseEntity<NGO> getNGO(@PathVariable Long ngoId) {
         NGO ngo = ngoService.getNGOById(ngoId);
         return ResponseEntity.ok(ngo);
     }
 
-    // ✅ Get all NGOs
-    @GetMapping
-    public ResponseEntity<List<NGO>> getAllNGOs() {
-        return ResponseEntity.ok(ngoService.getAllNGOs());
+    @PostMapping("/{ngoId}/packages")
+    public ResponseEntity<Package> createPackage(
+            @PathVariable Long ngoId,
+            @RequestBody Package pkg) {
+        return ResponseEntity.ok(ngoService.createPackage(ngoId, pkg));
     }
+
+    // Get all packages for an NGO
+    @GetMapping("/{ngoId}/packages")
+    public ResponseEntity<List<Package>> getPackages(@PathVariable Long ngoId) {
+        return ResponseEntity.ok(ngoService.getAllPackagesForNGO(ngoId));
+    }
+
+
 
 }

@@ -31,6 +31,10 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Set<Role> roles = new HashSet<>();
 
+
+    private boolean active = true;
+
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -94,4 +98,13 @@ public class User {
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+
 }

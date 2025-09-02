@@ -1,6 +1,8 @@
 package com.service;
 
 import com.entity.Package;
+import com.entity.PackageImage;
+import com.entity.PackageItem;
 import com.repository.PackageRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
@@ -16,44 +18,84 @@ public class PackageService {
         this.packageRepository = packageRepository;
     }
 
-    // Create new package
-    public Package createPackage(Package pkg) {
-        return packageRepository.save(pkg);
+    public Package getPackageById(Long packageId){
+        return packageRepository.findById(packageId).orElse(null);
     }
 
-    // Update package
-    public Package updatePackage(Long id, Package pkgDetails) {
-        Package pkg = packageRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Package not found with id: " + id));
 
-        pkg.setTitle(pkgDetails.getTitle());
-        pkg.setAmount(pkgDetails.getAmount());
-        pkg.setItems(pkgDetails.getItems());
-        pkg.setImages(pkgDetails.getImages());
-        return packageRepository.save(pkg);
-    }
 
-    // Soft delete (set inactive if you add "active" field) or full delete
-    public void deletePackage(Long id) {
-        if (!packageRepository.existsById(id)) {
-            throw new EntityNotFoundException("Package not found with id: " + id);
+    public Package updatePackageById(Long packageId, Package pkg) {
+        Package existing = packageRepository.findById(packageId)
+                .orElseThrow(() -> new EntityNotFoundException("Package not found"));
+
+        // update simple fields
+        if (pkg.getTitle() != null) existing.setTitle(pkg.getTitle());
+        if (pkg.getAmount() != null) existing.setAmount(pkg.getAmount());
+
+        // update items (replace list if provided)
+        if (pkg.getItems() != null && !pkg.getItems().isEmpty()) {
+            existing.getItems().clear();
+            existing.getItems().addAll(pkg.getItems());
         }
-        packageRepository.deleteById(id);
+
+        // update images (replace list if provided)
+        if (pkg.getImages() != null && !pkg.getImages().isEmpty()) {
+            // orphanRemoval = true ensures old ones get deleted
+           // existing.getImages().clear();
+            for (PackageImage img : pkg.getImages()) {
+                img.setPkg(existing); // set FK properly
+                existing.getImages().add(img);
+            }
+        }
+
+        return packageRepository.save(existing); // cascades updates
     }
 
-    // Get package by id
-    public Package getPackageById(Long id) {
-        return packageRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Package not found with id: " + id));
+    public String deletePackageById(Long packageId){
+        packageRepository.deleteById(packageId);
+        return "Package deleted Successfully";
     }
 
-    // Get all packages
-    public List<Package> getAllPackages() {
-        return packageRepository.findAll();
+    // add new image
+    public Package addImageToPackage(Long packageId, PackageImage image) {
+        Package pkg = packageRepository.findById(packageId)
+                .orElseThrow(() -> new EntityNotFoundException("Package not found"));
+
+        image.setPkg(pkg);
+        pkg.getImages().add(image);
+
+        return packageRepository.save(pkg);
     }
 
-    // Get packages by NGO
-    public List<Package> getPackagesByNgo(Long ngoId) {
-        return packageRepository.findByNgoId(ngoId);
+    // remove image
+    public Package removeImageFromPackage(Long packageId, Long imageId) {
+        Package pkg = packageRepository.findById(packageId)
+                .orElseThrow(() -> new EntityNotFoundException("Package not found"));
+
+        boolean removed = pkg.getImages().removeIf(img -> img.getId().equals(imageId));
+        if (!removed) throw new EntityNotFoundException("Image not found");
+
+        return packageRepository.save(pkg);
     }
+
+    // add new item
+    public Package addItemToPackage(Long packageId, PackageItem item) {
+        Package pkg = packageRepository.findById(packageId)
+                .orElseThrow(() -> new EntityNotFoundException("Package not found"));
+
+        pkg.getItems().add(item);
+        return packageRepository.save(pkg);
+    }
+
+    // remove item (assuming PackageItem has equals/hashCode on fields)
+    public Package removeItemFromPackage(Long packageId, String itemName) {
+        Package pkg = packageRepository.findById(packageId)
+                .orElseThrow(() -> new EntityNotFoundException("Package not found"));
+
+        boolean removed = pkg.getItems().remove(itemName);
+        if (!removed) throw new EntityNotFoundException("Item not found");
+
+        return packageRepository.save(pkg);
+    }
+
 }

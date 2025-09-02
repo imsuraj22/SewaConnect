@@ -13,8 +13,10 @@ public class Package {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "ngo_id", nullable = false)
-    private Long ngoId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ngo_id", nullable = false)
+    private NGO ngo;
+
 
     @NotNull
     private String title;
@@ -55,12 +57,12 @@ public class Package {
         this.id = id;
     }
 
-    public Long getNgoId() {
-        return ngoId;
+    public NGO getNgo() {
+        return ngo;
     }
 
-    public void setNgoId(Long ngoId) {
-        this.ngoId = ngoId;
+    public void setNgo(NGO ngo) {
+        this.ngo = ngo;
     }
 
     public String getTitle() {
