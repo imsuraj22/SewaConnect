@@ -4,6 +4,8 @@ import com.entity.Role;
 import com.entity.User;
 import com.exceptions.EntityNotFoundException;
 import com.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,12 +14,18 @@ import java.util.Optional;
 @Service
 public class UserService {
     private final UserRepository userRepository;
-    public UserService(UserRepository userRepository){
+    private final KafkaTemplate<String, Long> kafkaTemplate;
+
+    public UserService(UserRepository userRepository,KafkaTemplate<String, Long> kafkaTemplate){
         this.userRepository=userRepository;
+        this.kafkaTemplate=kafkaTemplate;
 
     }
     public Optional<User> createUser(User user){
         User savedUser = userRepository.save(user);
+        if(savedUser.getRoles().contains(Role.ROLE_NGO)){
+            kafkaTemplate.send("NEW_NGO_REGISTERED", savedUser.getId());
+        }
         return Optional.ofNullable(savedUser);
     }
 

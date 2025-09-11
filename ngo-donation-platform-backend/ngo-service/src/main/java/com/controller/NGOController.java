@@ -1,7 +1,9 @@
 package com.controller;
 
+import com.dto.NGODto;
 import com.entity.NGO;
 import com.entity.NGODocument;
+import com.entity.NGOStatus;
 import com.service.NGOService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -59,10 +61,14 @@ public class NGOController {
 
 
 //    // ✅ Get NGO by ID
-    @GetMapping("/{ngoId}")
-    public ResponseEntity<NGO> getNGO(@PathVariable Long ngoId) {
-        NGO ngo = ngoService.getNGOById(ngoId);
-        return ResponseEntity.ok(ngo);
+        @GetMapping("/{id}")
+        public ResponseEntity<NGODto> getNGO(@PathVariable Long id) {
+            return ResponseEntity.ok(ngoService.getNGOById(id));
+        }
+
+    @GetMapping("/status/{status}")
+    public ResponseEntity<List<NGODto>> getNGO(@PathVariable NGOStatus status) {
+        return ResponseEntity.ok(ngoService.getNGOByStatus(status));
     }
 
     @PostMapping("/{ngoId}/packages")

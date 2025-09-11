@@ -1,5 +1,7 @@
 package com.service;
 
+import com.dto.NGODocumentDto;
+import com.dto.NGODto;
 import com.entity.NGO;
 import com.entity.NGODocument;
 import com.entity.NGOStatus;
@@ -12,10 +14,9 @@ import org.postgresql.shaded.com.ongres.scram.common.bouncycastle.pbkdf2.Pack;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.swing.text.Document;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class NGOService {
@@ -86,10 +87,74 @@ public class NGOService {
 
 
     // ✅ Get NGO by ID
-    public NGO getNGOById(Long ngoId) {
-        return ngoRepository.findById(ngoId)
-                .orElseThrow(() -> new EntityNotFoundException("NGO not found with id " + ngoId));
+    public NGODto getNGOById(Long ngoId) {
+        NGO ngo = ngoRepository.findById(ngoId).orElse(null);
+        NGODto ngoD=new NGODto();
+        ngoD.setId(ngo.getId());
+        ngoD.setUserId(ngo.getUserId());
+        ngoD.setName(ngo.getName());
+        ngoD.setAddress(ngo.getAddress());
+        ngoD.setDescription(ngo.getDescription());
+        ngoD.setNgoStatus(ngo.getStatus().toString());
+        Set<NGODocument> documents=ngo.getDocuments();
+        Set<NGODocumentDto> tdocs=new HashSet<>();
+        for(NGODocument ngoDocs:documents){
+            NGODocumentDto nd=new NGODocumentDto();
+            nd.setId(ngoDocs.getId());
+            nd.setFileName(ngoDocs.getFileName());
+            nd.setDocumentData(ngoDocs.getDocumentData());
+            tdocs.add(nd);
+        }
+        ngoD.setDocuments(tdocs);
+        ngoD.setImages(ngo.getImages());
+        ngoD.setLocationLat(ngo.getLocationLat());
+        ngoD.setLocationLng(ngo.getLocationLat());
+
+        return ngoD;
+
+
     }
+
+    public List<NGODto> getNGOByStatus(NGOStatus status) {
+        // Fetch all NGOs with the given status
+        List<NGO> ngos = ngoRepository.findByStatus(status);
+
+        // Map each NGO entity to NGODto
+        List<NGODto> ngoDtos = new ArrayList<>();
+        for (NGO ngo : ngos) {
+            NGODto ngoD = new NGODto();
+            ngoD.setId(ngo.getId());
+            ngoD.setUserId(ngo.getUserId());
+            ngoD.setName(ngo.getName());
+            ngoD.setAddress(ngo.getAddress());
+            ngoD.setDescription(ngo.getDescription());
+            ngoD.setNgoStatus(ngo.getStatus().toString());
+
+            // Map documents
+            Set<NGODocument> documents = ngo.getDocuments();
+            Set<NGODocumentDto> tdocs = new HashSet<>();
+            for (NGODocument ngoDocs : documents) {
+                NGODocumentDto nd = new NGODocumentDto();
+                nd.setId(ngoDocs.getId());
+                nd.setFileName(ngoDocs.getFileName());
+                nd.setDocumentData(ngoDocs.getDocumentData());
+                tdocs.add(nd);
+            }
+            ngoD.setDocuments(tdocs);
+
+            // Set images
+            ngoD.setImages(ngo.getImages());
+
+            // Set location
+            ngoD.setLocationLat(ngo.getLocationLat());
+            ngoD.setLocationLng(ngo.getLocationLng());
+
+            ngoDtos.add(ngoD);
+        }
+
+        return ngoDtos;
+    }
+
 
     // ✅ Get all APPROVED NGOs (only visible ones to donors)
     public List<NGO> getAllNGOs() {
@@ -100,23 +165,23 @@ public class NGOService {
     }
 
     // ✅ Admin actions
-    public NGO approveNGO(Long ngoId) {
-        NGO ngo = getNGOById(ngoId);
-        ngo.setStatus(NGOStatus.APPROVED);
-        return ngoRepository.save(ngo);
-    }
-
-    public NGO rejectNGO(Long ngoId) {
-        NGO ngo = getNGOById(ngoId);
-        ngo.setStatus(NGOStatus.REJECTED);
-        return ngoRepository.save(ngo);
-    }
-
-    public NGO suspendNGO(Long ngoId) {
-        NGO ngo = getNGOById(ngoId);
-        ngo.setStatus(NGOStatus.SUSPENDED);
-        return ngoRepository.save(ngo);
-    }
+//    public NGO approveNGO(Long ngoId) {
+//        NGO ngo = getNGOById(ngoId);
+//        ngo.setStatus(NGOStatus.APPROVED);
+//        return ngoRepository.save(ngo);
+//    }
+//
+//    public NGO rejectNGO(Long ngoId) {
+//        NGO ngo = getNGOById(ngoId);
+//        ngo.setStatus(NGOStatus.REJECTED);
+//        return ngoRepository.save(ngo);
+//    }
+//
+//    public NGO suspendNGO(Long ngoId) {
+//        NGO ngo = getNGOById(ngoId);
+//        ngo.setStatus(NGOStatus.SUSPENDED);
+//        return ngoRepository.save(ngo);
+//    }
     public void deactivateNGO(Long ngoId) {
         NGO ngo = ngoRepository.findById(ngoId)
                 .orElseThrow(() -> new EntityNotFoundException("NGO not found with id " + ngoId));
