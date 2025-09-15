@@ -26,20 +26,10 @@ public class UserController {
                 .orElseThrow(() -> new RuntimeException("Failed to create user"));
     }
 
-
-    @GetMapping
-    public ResponseEntity<List<User>> getAllUsers() {
-        return ResponseEntity.ok(userService.getAllUsers());
-    }
-
-    @GetMapping("/by-role")
-    public ResponseEntity<List<User>> getUsersByRole(@RequestParam Role role) {
-        return ResponseEntity.ok(userService.getUsersByRole(role));
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
-        userService.deleteUserById(id);
-        return ResponseEntity.ok("User deleted successfully");
+    @PutMapping("/{id}")
+    public ResponseEntity<User> updateUser(@PathVariable Long id,@RequestBody User user){
+        return userService.updateUser(id,user)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 }

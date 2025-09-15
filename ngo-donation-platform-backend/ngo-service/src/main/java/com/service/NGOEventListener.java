@@ -31,11 +31,21 @@ public class NGOEventListener {
         ngoRepository.save(ngo);
     }
 
-    @KafkaListener(topics = "NEW_NGO_REGISTERED", groupId = "ngo-create-group")
-    public void createNGO(String message){
-        Long id=Long.parseLong(message);
-        ngoService.registerNGO(id);
+
+    @KafkaListener(topics = "ngo-delete-approved", groupId = "ngo-group")
+    public void handleNGODeleteApproval(Long ngoId) {
+        Long id = Long.valueOf(ngoId);
+        ngoService.deleteById(id);
+
+        //send email
     }
+
+    @KafkaListener(topics = "ngo-delete-rejected", groupId = "ngo-group")
+    public void handleApproveNGO(Long ngoId) {
+        System.out.println("NGO deletion rejected for id: " + ngoId);
+        //send email
+    }
+
 
 
 }

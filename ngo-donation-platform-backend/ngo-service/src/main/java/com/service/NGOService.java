@@ -11,6 +11,7 @@ import com.repository.NGODocumentRepository;
 import com.repository.PackageRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.postgresql.shaded.com.ongres.scram.common.bouncycastle.pbkdf2.Pack;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,12 +25,14 @@ public class NGOService {
     private final NGORepository ngoRepository;
     private final NGODocumentRepository documentRepository;
     private final PackageRepository packageRepository;
+    private final KafkaTemplate<String,NGODto> ngoKafkaTemplate;
 
     public NGOService(NGORepository ngoRepository, NGODocumentRepository documentRepository,
-                      PackageRepository packageRepository) {
+                      PackageRepository packageRepository,KafkaTemplate<String,NGODto> ngoKafkaTemplate) {
         this.ngoRepository = ngoRepository;
         this.documentRepository = documentRepository;
         this.packageRepository=packageRepository;
+        this.ngoKafkaTemplate=ngoKafkaTemplate;
     }
 
     public NGO registerNGO(Long userId) {
@@ -86,6 +89,7 @@ public class NGOService {
     }
 
 
+    //admin methods
     // ✅ Get NGO by ID
     public NGODto getNGOById(Long ngoId) {
         NGO ngo = ngoRepository.findById(ngoId).orElse(null);
@@ -113,6 +117,65 @@ public class NGOService {
         return ngoD;
 
 
+    }
+
+    public void sendToVerify(NGODto ngoDto){
+        NGO ngo=new NGO();
+        if(ngoDto.getAddress()!=null) ngo.setAddress(ngoDto.getAddress());
+        if(ngoDto.getUserId()!=null) ngo.setUserId(ngoDto.getUserId());
+        if(ngoDto.getDescription()!=null) ngo.setDescription(ngoDto.getDescription());
+        if(ngoDto.getImages()!=null) ngo.setImages(ngoDto.getImages());
+        if(ngoDto.getLocationLat()!=null) ngo.setLocationLat(ngoDto.getLocationLat());
+        if(ngoDto.getLocationLng()!=null) ngo.setLocationLng(ngoDto.getLocationLng());
+        if(ngoDto.getDocuments()!=null){
+            Set<NGODocument> newDocs=new HashSet<>();
+            Set<NGODocumentDto> docs=ngoDto.getDocuments();
+            for(NGODocumentDto nd:docs){
+                NGODocument doc=new NGODocument();
+                doc.setNgo(ngo);
+                doc.setFileName(nd.getFileName());
+                doc.setDocumentData(nd.getDocumentData());
+                newDocs.add(doc);
+            }
+            ngo.setDocuments(newDocs);
+        }
+        ngoRepository.save(ngo);
+        ngoKafkaTemplate.send("ngo-save-request",ngoDto);
+
+    }
+
+    public void deleteNGO(Long id){
+        Optional<NGO> user=ngoRepository.findById(id);
+        if(user.isPresent()){
+            NGO ngo=user.get();
+            NGODto ngoD=new NGODto();
+            ngoD.setId(ngo.getId());
+            ngoD.setUserId(ngo.getUserId());
+            ngoD.setName(ngo.getName());
+            ngoD.setAddress(ngo.getAddress());
+            ngoD.setDescription(ngo.getDescription());
+            ngoD.setNgoStatus(ngo.getStatus().toString());
+            Set<NGODocument> documents=ngo.getDocuments();
+            Set<NGODocumentDto> tdocs=new HashSet<>();
+            for(NGODocument ngoDocs:documents){
+                NGODocumentDto nd=new NGODocumentDto();
+                nd.setId(ngoDocs.getId());
+                nd.setFileName(ngoDocs.getFileName());
+                nd.setDocumentData(ngoDocs.getDocumentData());
+                tdocs.add(nd);
+            }
+            ngoD.setDocuments(tdocs);
+            ngoD.setImages(ngo.getImages());
+            ngoD.setLocationLat(ngo.getLocationLat());
+            ngoD.setLocationLng(ngo.getLocationLat());
+
+            ngoKafkaTemplate.send("ngo-delete-request",ngoD);
+        }
+
+    }
+
+    public void deleteById(Long id){
+        ngoRepository.deleteById(id);
     }
 
     public List<NGODto> getNGOByStatus(NGOStatus status) {
@@ -164,24 +227,7 @@ public class NGOService {
                 .toList();
     }
 
-    // ✅ Admin actions
-//    public NGO approveNGO(Long ngoId) {
-//        NGO ngo = getNGOById(ngoId);
-//        ngo.setStatus(NGOStatus.APPROVED);
-//        return ngoRepository.save(ngo);
-//    }
-//
-//    public NGO rejectNGO(Long ngoId) {
-//        NGO ngo = getNGOById(ngoId);
-//        ngo.setStatus(NGOStatus.REJECTED);
-//        return ngoRepository.save(ngo);
-//    }
-//
-//    public NGO suspendNGO(Long ngoId) {
-//        NGO ngo = getNGOById(ngoId);
-//        ngo.setStatus(NGOStatus.SUSPENDED);
-//        return ngoRepository.save(ngo);
-//    }
+
     public void deactivateNGO(Long ngoId) {
         NGO ngo = ngoRepository.findById(ngoId)
                 .orElseThrow(() -> new EntityNotFoundException("NGO not found with id " + ngoId));
