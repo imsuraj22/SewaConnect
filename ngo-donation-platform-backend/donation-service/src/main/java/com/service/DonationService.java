@@ -1,12 +1,16 @@
 package com.service;
 
 import com.entity.Donation;
+import com.entity.DonationImage;
 import com.entity.DonationStatus;
 import com.exceptions.EntityNotFoundException;
+import com.repository.DonationImageRepo;
 import com.repository.DonationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,9 +19,30 @@ import java.util.Optional;
 public class DonationService {
 
     private final DonationRepository donationRepository;
+    private final DonationImageRepo donationImageRepo;
 
-    public Donation createDonation(Donation donation) {
-        return donationRepository.save(donation);
+
+
+    public Donation createDonation(Donation dto, MultipartFile[] images) throws IOException {
+        // 1. Save Donation
+        Donation donation = new Donation();
+        donation.setDonorId(dto.getDonorId());
+        donation.setDonationType(dto.getDonationType());
+        donation.setDonationStatus(dto.getDonationStatus());
+        donation.setNgoId(dto.getNgoId());
+        donation.setAmount(dto.getAmount());
+        donation.setCurrency(dto.getCurrency());
+
+
+        // 2. Save Images linked to donation
+        for (MultipartFile file : images) {
+            DonationImage donationImage = new DonationImage();
+            donationImage.setImageData(file.getBytes());
+            donationImage.setDonation(donation); // <-- links image to donation
+            donationImageRepo.save(donationImage);
+        }
+
+        return donation;
     }
 
     public Donation getDonationById(Long id) throws EntityNotFoundException {

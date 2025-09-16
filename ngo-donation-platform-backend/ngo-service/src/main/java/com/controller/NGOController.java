@@ -1,5 +1,6 @@
 package com.controller;
 
+import com.dto.ClaimRequestDTO;
 import com.dto.NGODto;
 import com.entity.NGO;
 import com.entity.NGODocument;
@@ -82,6 +83,11 @@ public class NGOController {
     @GetMapping("/{ngoId}/packages")
     public ResponseEntity<List<Package>> getPackages(@PathVariable Long ngoId) {
         return ResponseEntity.ok(ngoService.getAllPackagesForNGO(ngoId));
+    }
+
+    @PostMapping("/claim-request/{id}")
+    public ResponseEntity<String> createClaimRequest(ClaimRequestDTO claimRequestDTO,@PathVariable Long id){
+
     }
 
 

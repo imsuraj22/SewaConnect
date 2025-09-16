@@ -1,5 +1,6 @@
 package com.service;
 
+import com.dto.ClaimRequestDTO;
 import com.dto.NGODocumentDto;
 import com.dto.NGODto;
 import com.entity.NGO;
@@ -26,13 +27,16 @@ public class NGOService {
     private final NGODocumentRepository documentRepository;
     private final PackageRepository packageRepository;
     private final KafkaTemplate<String,NGODto> ngoKafkaTemplate;
+    private final KafkaTemplate<String, ClaimRequestDTO> claimRequestKafkaTemplate;
 
     public NGOService(NGORepository ngoRepository, NGODocumentRepository documentRepository,
-                      PackageRepository packageRepository,KafkaTemplate<String,NGODto> ngoKafkaTemplate) {
+                      PackageRepository packageRepository,KafkaTemplate<String,NGODto> ngoKafkaTemplate,
+                      KafkaTemplate<String, ClaimRequestDTO> claimRequestKafkaTemplate) {
         this.ngoRepository = ngoRepository;
         this.documentRepository = documentRepository;
         this.packageRepository=packageRepository;
         this.ngoKafkaTemplate=ngoKafkaTemplate;
+        this.claimRequestKafkaTemplate=claimRequestKafkaTemplate;
     }
 
     public NGO registerNGO(Long userId) {
@@ -169,7 +173,7 @@ public class NGOService {
             ngoD.setLocationLat(ngo.getLocationLat());
             ngoD.setLocationLng(ngo.getLocationLat());
 
-            ngoKafkaTemplate.send("ngo-delete-request",ngoD);
+            ngoKafkaTemplate.send("ngo-save-request",ngoD);
         }
 
     }
@@ -262,6 +266,9 @@ public class NGOService {
                 .orElseThrow(() -> new EntityNotFoundException("NGO not found"));
 
         return packageRepository.findByNgoId(ngoId);
+    }
+    public void createClaim(ClaimRequestDTO claimRequestDTO){
+        claimRequestKafkaTemplate.send("claim-create-request",claimRequestDTO);
     }
 
 

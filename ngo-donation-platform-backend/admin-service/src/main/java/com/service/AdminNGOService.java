@@ -58,7 +58,7 @@ public class AdminNGOService {
     // 🔹 Admin actions (publish events)
 
 
-    @KafkaListener(topics = "ngo-save-request", groupId = "admin-group")
+    @KafkaListener(topics = "ngo-save-request", groupId = "donation-group")
     public void processNGODeleteRequest(NGODto ngoDto) {
 
         NGOData ngoData = new NGOData();

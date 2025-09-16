@@ -7,7 +7,9 @@ import com.service.DonationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -18,9 +20,12 @@ public class DonationController {
     private final DonationService donationService;
 
     // --- Create Donation ---
-    @PostMapping
-    public ResponseEntity<Donation> createDonation(@RequestBody Donation donation) {
-        Donation savedDonation = donationService.createDonation(donation);
+    @PostMapping()
+    public ResponseEntity<Donation> createDonation(
+            @RequestPart("donation") Donation donation,
+            @RequestPart("images") MultipartFile[] images) throws IOException {
+
+        Donation savedDonation = donationService.createDonation(donation, images);
         return ResponseEntity.ok(savedDonation);
     }
 

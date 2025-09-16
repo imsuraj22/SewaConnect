@@ -61,7 +61,7 @@ public class AdminUserService {
 
 
 
-    @KafkaListener(topics = "user-delete-request", groupId = "admin-group")
+    @KafkaListener(topics = "user-delete-request", groupId = "donation-group")
     public void processUserDeleteRequest(UserDTO userDTO) {
 
         UserData user=new UserData();
