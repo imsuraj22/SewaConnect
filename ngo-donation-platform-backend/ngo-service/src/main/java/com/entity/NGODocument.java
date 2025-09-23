@@ -28,7 +28,7 @@ public class NGODocument {
 
     // Store actual file
     @Lob
-    @Column(name = "document_data", columnDefinition = "LONGBLOB")
+    @Column(name = "document_data")
     private byte[] documentData;
 
     private LocalDateTime uploadedAt;

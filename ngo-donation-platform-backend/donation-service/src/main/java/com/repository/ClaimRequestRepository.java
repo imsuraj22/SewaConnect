@@ -3,9 +3,10 @@ package com.repository;
 import com.entity.ClaimRequest;
 import com.entity.DonationStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
-
+@Repository
 public interface ClaimRequestRepository extends JpaRepository<ClaimRequest,Long> {
     List<ClaimRequest> findByNgoId(Long ngoId);
 

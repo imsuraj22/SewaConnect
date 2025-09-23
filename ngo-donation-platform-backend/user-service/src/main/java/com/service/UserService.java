@@ -30,6 +30,7 @@ public class UserService {
 
     public Optional<User> createUser(User user){
         User savedUser = userRepository.save(user);
+        System.out.println("User entered ");
         if(savedUser.getRoles().contains(Role.ROLE_NGO)){
             restTemplate.postForObject(
                     ngoServiceUrl + "/api/ngos/register/" + savedUser.getId(),
@@ -66,7 +67,8 @@ public class UserService {
             Set<Role> roles=u.getRoles();
             for(Role rr:roles) r.add(rr.toString());
             userDTO.setRoles(r);
-            userKafkaTemplate.send("user-delete-request",userDTO);
+          userKafkaTemplate.send("user-delete-request",userDTO);
+          System.out.println("Kafka is running in User service");
         }
 
     }
@@ -76,7 +78,7 @@ public class UserService {
 
     //admin only methods
     public List<UserDTO> getUsersByRole(Role role){
-        List<User> users= userRepository.findByRole(role);
+        List<User> users= userRepository.findByRoles(role);
         List<UserDTO> userDTOS=new ArrayList<>();
         for(int i=0;i<users.size();i++){
             User u=users.get(i);

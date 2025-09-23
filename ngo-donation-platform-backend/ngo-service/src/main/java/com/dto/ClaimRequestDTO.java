@@ -12,4 +12,5 @@ public class ClaimRequestDTO {
     private String status;
     private LocalDate createdAt;
     private LocalDate updatedAt;
+    private boolean claimed;
 }

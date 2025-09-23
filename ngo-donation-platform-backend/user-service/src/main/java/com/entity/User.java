@@ -35,7 +35,7 @@ public class User {
     private boolean active = true;
 
 
-    @Column(nullable = false, updatable = false)
+
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;

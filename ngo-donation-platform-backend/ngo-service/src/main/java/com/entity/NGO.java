@@ -40,8 +40,9 @@ public class NGO {
     // ✅ Store raw images in DB (BLOBs)
     @ElementCollection
     @CollectionTable(name = "ngo_images", joinColumns = @JoinColumn(name = "ngo_id"))
-    @Column(name = "image_data", columnDefinition = "LONGBLOB")  // Use BLOB/LONGBLOB
+    @Column(name = "image_data")  // no columnDefinition needed, Hibernate maps byte[] to bytea
     private Set<byte[]> images = new HashSet<>();
+
 
 
     private Double locationLat;

@@ -85,9 +85,10 @@ public class NGOController {
         return ResponseEntity.ok(ngoService.getAllPackagesForNGO(ngoId));
     }
 
-    @PostMapping("/claim-request/{id}")
-    public ResponseEntity<String> createClaimRequest(ClaimRequestDTO claimRequestDTO,@PathVariable Long id){
-
+    @PostMapping("/claim-request/")
+    public ResponseEntity<String> createClaimRequest(ClaimRequestDTO claimRequestDTO){
+        ngoService.createClaim(claimRequestDTO);
+        return  ResponseEntity.ok("Claim created");
     }
 
 

@@ -9,15 +9,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ClaimRequestService {
 
     private final ClaimRequestRepository claimRequestRepository;
+    private final DonationService donationService;
 
 
-    public ClaimRequestService(ClaimRequestRepository claimRequestRepository){
+    public ClaimRequestService(ClaimRequestRepository claimRequestRepository,DonationService donationService){
         this.claimRequestRepository=claimRequestRepository;
+        this.donationService=donationService;
     }
 
     // Create a new claim request
@@ -90,4 +93,16 @@ public class ClaimRequestService {
     public void deleteClaim(Long id) {
         claimRequestRepository.deleteById(id);
     }
+
+    public void approvedClaim(Long id){
+        Optional<ClaimRequest> cl=claimRequestRepository.findById(id);
+        if(cl.isPresent()){
+            ClaimRequest claimRequest=cl.get();
+            long did=claimRequest.getDonationId();
+            donationService.setDonationStatus(id,DonationStatus.ACCEPTED);
+
+        }
+
+    }
+
 }

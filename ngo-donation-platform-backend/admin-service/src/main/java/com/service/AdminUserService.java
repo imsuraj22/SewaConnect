@@ -70,12 +70,9 @@ public class AdminUserService {
         user.setUsername(userDTO.getUsername());
         user.setRoles(userDTO.getRoles());
         userDataRepo.save(user);
+        System.out.println("Kafka is running in Admin service");
 
-//        if (approved) {
-//            longKafkaTemplate.send("user-delete-approved", userDTO.getId());
-//        } else {
-//            longKafkaTemplate.send("user-delete-rejected", userDTO.getId());
-//        }
+
     }
 
     public List<UserDTO> getUsersToDelete(){

@@ -10,6 +10,7 @@ import java.util.Set;
 @Entity
 @Data
 public class UserData {
+    @Id
     private Long id;
     private String username;
     private String email;

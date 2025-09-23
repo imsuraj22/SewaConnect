@@ -1,8 +1,5 @@
 package com.dto;
 
-import com.entity.DonationStatus;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.time.LocalDate;

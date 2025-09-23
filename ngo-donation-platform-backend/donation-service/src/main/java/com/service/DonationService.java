@@ -67,4 +67,13 @@ public class DonationService {
     public void deleteDonation(Long donationId) {
         donationRepository.deleteById(donationId);
     }
+
+    public void setDonationStatus(Long id,DonationStatus status){
+        Optional<Donation> donation=donationRepository.findById(id);
+        if(donation.isPresent()){
+            Donation d=donation.get();
+            d.setDonationStatus(status);
+            donationRepository.save(d);
+        }
+    }
 }

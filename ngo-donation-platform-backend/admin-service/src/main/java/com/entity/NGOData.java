@@ -10,6 +10,7 @@ import java.util.Set;
 @Entity
 @Data
 public class NGOData {
+    @Id
     private Long id;
     private Long userId;
     private String name;

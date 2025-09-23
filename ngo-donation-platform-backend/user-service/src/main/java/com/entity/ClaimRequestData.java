@@ -1,14 +1,13 @@
-package com.dto;
+package com.entity;
 
-import com.entity.DonationStatus;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
+import jakarta.persistence.Entity;
 import lombok.Data;
 
 import java.time.LocalDate;
 
+@Entity
 @Data
-public class ClaimRequestDTO {
+public class ClaimRequestData {
     private long id;
     private long donationId;
     private long ngoId;

@@ -2,10 +2,12 @@
 
     import jakarta.persistence.*;
     import jakarta.validation.constraints.NotNull;
+    import lombok.Data;
 
     import java.time.LocalDate;
 
     @Entity
+    @Data
     public class ClaimRequest {
 
         @Id
@@ -25,43 +27,9 @@
         private LocalDate createdAt;
         private LocalDate updatedAt;
 
+
         // ----- Getters & Setters -----
 
-        public long getId() {
-            return id;
-        }
-
-        public long getDonationId() {
-            return donationId;
-        }
-
-        public void setDonationId(long donationId) {
-            this.donationId = donationId;
-        }
-
-        public long getNgoId() {
-            return ngoId;
-        }
-
-        public void setNgoId(long ngoId) {
-            this.ngoId = ngoId;
-        }
-
-        public DonationStatus getStatus() {
-            return status;
-        }
-
-        public void setStatus(DonationStatus status) {
-            this.status = status;
-        }
-
-        public LocalDate getCreatedAt() {
-            return createdAt;
-        }
-
-        public LocalDate getUpdatedAt() {
-            return updatedAt;
-        }
 
         // Auto-set createdAt when inserting new record
         @PrePersist
