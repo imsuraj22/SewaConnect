@@ -78,7 +78,7 @@
 ### ⚙️ Setup & Run
 <li><b>Clone Repository</b></li>
 
- - git clone https://github.com/your-username/ngo-donation-platform.git
+ - git clone https://github.com/imsuraj22/SewaConnect/tree/main
  - cd ngo-donation-platform
 
 <li><b>Start Infrastructure (Kafka + Zookeeper + PostgreSQL)</b></li>
