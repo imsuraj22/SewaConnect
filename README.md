@@ -6,6 +6,31 @@ A microservices-based platform that connects **donors** and **NGOs**, making it 
 
 ---
 
+## Demo video
+
+Below is the demo video link for SewaConnect covering registration, NGO workspace, admin approval, and donation flow.
+
+🎥 Demo Video:
+https://drive.google.com/file/d/1A81A95WYQ8qMDx2n2TdT5RXBaRtVBasx/view?usp=sharing
+
+
+
+---
+
+## Screenshots
+
+<img width="1600" height="812" alt="WhatsApp Image 2026-06-06 at 18 23 16" src="https://github.com/user-attachments/assets/d2c1a499-83b9-4a8b-972d-9c54bc44236e" />
+<img width="1600" height="812" alt="WhatsApp Image 2026-06-06 at 18 22 51" src="https://github.com/user-attachments/assets/9aa17cf5-3d56-43de-b475-f46305e8f756" />
+<img width="1600" height="805" alt="WhatsApp Image 2026-06-06 at 18 22 20" src="https://github.com/user-attachments/assets/1e6382e2-fc54-4e78-a9e0-1f05103b7b1e" />
+<img width="1600" height="806" alt="WhatsApp Image 2026-06-06 at 18 21 37" src="https://github.com/user-attachments/assets/8e99bd08-d9c1-4a1c-bd14-b963e3610d2d" />
+<img width="1600" height="809" alt="WhatsApp Image 2026-06-06 at 18 21 13" src="https://github.com/user-attachments/assets/9a2d5bce-7244-4071-b3c3-a44562a2d2a9" />
+<img width="1600" height="804" alt="WhatsApp Image 2026-06-06 at 18 20 34" src="https://github.com/user-attachments/assets/201f2d13-0c7d-4df9-b491-4e646c894660" />
+
+
+> Add images under `docs/screenshots/` in your repo and update filenames if needed.
+
+---
+
 ## Features
 
 | Service | Responsibility |
