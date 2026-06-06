@@ -2,6 +2,9 @@ package com.controller;
 
 import com.dto.NGODto;
 import com.service.AdminNGOService;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -62,5 +65,17 @@ public class AdminNGOController {
     @PostMapping("/{ngoId}/deactivate")
     public void deactivateNGO(@PathVariable Long ngoId) {
         adminNGOService.deactivateNGO(ngoId);
+    }
+
+    @GetMapping("/{ngoId}/documents/{documentId}/download")
+    public ResponseEntity<byte[]> downloadDocument(
+            @PathVariable Long ngoId,
+            @PathVariable Long documentId
+    ) {
+        byte[] data = adminNGOService.getDocumentBytes(ngoId, documentId);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"document\"")
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(data);
     }
 }

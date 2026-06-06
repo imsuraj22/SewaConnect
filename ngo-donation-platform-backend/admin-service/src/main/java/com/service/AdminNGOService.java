@@ -34,52 +34,57 @@ public class AdminNGOService {
         this.ngoDataRepo=ngoDataRepo;
         this.ngoDocumentDataRepo=ngoDocumentDataRepo;
     }
-    @Value("${ngo.service.url}") // e.g. http://localhost:8081
+    @Value("${ngo.service.url}")
     private String ngoServiceUrl;
 
     // 🔹 Fetch NGO details by ID
     public NGODto getNGODetails(Long ngoId) {
         return restTemplate.getForObject(
-                ngoServiceUrl + "/ngos/" + ngoId,
+                ngoServiceUrl + "/api/ngos/" + ngoId,
                 NGODto.class
         );
     }
 
-    // 🔹 Fetch all pending NGOs
+    // NGOs that completed profile and submitted for admin review
     public List<NGODto> getPendingNGOs() {
-        NGODto[] result = restTemplate.getForObject(
-                ngoServiceUrl + "/ngos/status/PENDING",
+        NGODto[] underReview = restTemplate.getForObject(
+                ngoServiceUrl + "/api/ngos/status/UNDER_REVIEW",
                 NGODto[].class
         );
-        return Arrays.asList(result);
+        if (underReview == null || underReview.length == 0) {
+            return List.of();
+        }
+        return Arrays.asList(underReview);
     }
 
 
     // 🔹 Admin actions (publish events)
 
 
-    @KafkaListener(topics = "ngo-save-request", groupId = "donation-group")
+    @KafkaListener(topics = "ngo-save-request", groupId = "admin-service-group")
     public void processNGODeleteRequest(NGODto ngoDto) {
 
         NGOData ngoData = new NGOData();
         ngoData.setId(ngoDto.getId()); // coming from original NGO service
         ngoData.setNgoStatus(ngoDto.getNgoStatus());
         ngoData.setAddress(ngoDto.getAddress());
-        ngoData.setLocationLat(ngoDto.getLocationLat());
-        ngoData.setLocationLng(ngoDto.getLocationLng());
+        ngoData.setPhoneNumber(ngoDto.getPhoneNumber());
+        ngoData.setContactEmail(ngoDto.getContactEmail());
 
         Set<NGODocumentData> newDocs = new HashSet<>();
-        for (NGODocumentDto ng : ngoDto.getDocuments()) {
-            NGODocumentData doc = new NGODocumentData();
-            doc.setId(ng.getId());
-            doc.setFileName(ng.getFileName());
-            doc.setDocumentData(ng.getDocumentData());
-            doc.setNgo(ngoData);
-            newDocs.add(doc);
+        if (ngoDto.getDocuments() != null) {
+            for (NGODocumentDto ng : ngoDto.getDocuments()) {
+                NGODocumentData doc = new NGODocumentData();
+                doc.setId(ng.getId());
+                doc.setFileName(ng.getFileName());
+                doc.setDocumentData(ng.getDocumentData());
+                doc.setNgo(ngoData);
+                newDocs.add(doc);
+            }
         }
         ngoData.setDocuments(newDocs);
 
-        ngoData.setImages(new HashSet<>(ngoDto.getImages()));
+        ngoData.setImages(ngoDto.getImages() != null ? new HashSet<>(ngoDto.getImages()) : new HashSet<>());
 
 
         ngoDataRepo.save(ngoData);
@@ -130,43 +135,38 @@ public class AdminNGOService {
         }
         return ngoDtos;
     }
-    public void approveNGO(Long id) {
-        Optional<NGOData> ngoData=ngoDataRepo.findById(id);
-        if(ngoData.isPresent()){
-            NGOData n=ngoData.get();
-            kafkaTemplate.send("ngo-status-events", "APPROVED:" + n.getId());
-            ngoDataRepo.deleteById(id);
-        }
+  /** Updates status in ngo-service (source of truth for the review queue). */
+    private void applyNgoStatus(Long ngoId, String status) {
+        kafkaTemplate.send("ngo-status-events", status + ":" + ngoId);
+        restTemplate.postForObject(
+                ngoServiceUrl + "/api/ngos/" + ngoId + "/admin/status?status=" + status,
+                null,
+                NGODto.class
+        );
+        ngoDataRepo.findById(ngoId).ifPresent(legacy -> ngoDataRepo.deleteById(ngoId));
     }
 
-    public void rejectNGO(Long id) {
-        Optional<NGOData> ngoData=ngoDataRepo.findById(id);
-        if(ngoData.isPresent()){
-            NGOData n=ngoData.get();
-            kafkaTemplate.send("ngo-status-events", "REJECTED:" + id);
-            ngoDataRepo.deleteById(id);
-        }
-
+    public void approveNGO(Long ngoId) {
+        applyNgoStatus(ngoId, "APPROVED");
     }
 
-    public void suspendNGO(Long id) {
-        Optional<NGOData> ngoData=ngoDataRepo.findById(id);
-        if(ngoData.isPresent()){
-            NGOData n=ngoData.get();
-            kafkaTemplate.send("ngo-status-events", "SUSPENDED:" + id);
-            ngoDataRepo.deleteById(id);
-        }
-
+    public void rejectNGO(Long ngoId) {
+        applyNgoStatus(ngoId, "REJECTED");
     }
 
-    public void deactivateNGO(Long id) {
-        Optional<NGOData> ngoData=ngoDataRepo.findById(id);
-        if(ngoData.isPresent()){
-            NGOData n=ngoData.get();
-            kafkaTemplate.send("ngo-status-events", "DEACTIVATED:" + id);
-            ngoDataRepo.deleteById(id);
-        }
+    public void suspendNGO(Long ngoId) {
+        applyNgoStatus(ngoId, "SUSPENDED");
+    }
 
+    public void deactivateNGO(Long ngoId) {
+        applyNgoStatus(ngoId, "DEACTIVATED");
+    }
+
+    public byte[] getDocumentBytes(Long ngoId, Long documentId) {
+        return restTemplate.getForObject(
+                ngoServiceUrl + "/api/ngos/" + ngoId + "/documents/" + documentId + "/download",
+                byte[].class
+        );
     }
 
 

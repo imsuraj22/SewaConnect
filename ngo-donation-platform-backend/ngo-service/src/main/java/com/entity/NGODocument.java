@@ -1,10 +1,14 @@
 package com.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "ngo_document")
 public class NGODocument {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,6 +23,11 @@ public class NGODocument {
         return id;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    @JsonIgnore
     public NGO getNgo() {
         return ngo;
     }
@@ -26,9 +35,9 @@ public class NGODocument {
     private String fileName;
     // e.g. "REGISTRATION_CERTIFICATE", "PAN_CARD", "TRUST_DEED"
 
-    // Store actual file
-    @Lob
-    @Column(name = "document_data")
+    /** PostgreSQL {@code bytea} — avoids OID/large-object auto-commit errors. */
+    @JdbcTypeCode(SqlTypes.VARBINARY)
+    @Column(name = "document_data", columnDefinition = "bytea")
     private byte[] documentData;
 
     private LocalDateTime uploadedAt;
@@ -45,6 +54,7 @@ public class NGODocument {
         this.fileName = fileName;
     }
 
+    @JsonIgnore
     public byte[] getDocumentData() {
         return documentData;
     }
@@ -53,8 +63,13 @@ public class NGODocument {
         this.documentData = documentData;
     }
 
-    // Type of document
+    public LocalDateTime getUploadedAt() {
+        return uploadedAt;
+    }
 
+    public void setUploadedAt(LocalDateTime uploadedAt) {
+        this.uploadedAt = uploadedAt;
+    }
 
     @PrePersist
     public void onUpload() {

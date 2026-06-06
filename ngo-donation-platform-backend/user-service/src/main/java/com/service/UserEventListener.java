@@ -15,7 +15,7 @@ public class UserEventListener {
         this.claimRequestDataService=claimRequestDataService;
     }
 
-    @KafkaListener(topics = "user-delete-approved", groupId = "donation-group")
+    @KafkaListener(topics = "user-delete-approved", groupId = "user-service-group")
     public void handleUserDeleteApproval(Long userId) {
         Long id = Long.valueOf(userId);
         userService.deleteById(id);
@@ -23,12 +23,12 @@ public class UserEventListener {
     }
 
     // Handle admin rejection
-    @KafkaListener(topics = "user-delete-rejected", groupId = "donation-group")
+    @KafkaListener(topics = "user-delete-rejected", groupId = "user-service-group")
     public void handleUserDeleteRejection(Long userId) {
         System.out.println("User deletion rejected for id: " + userId);
         //send user a mail
     }
-    @KafkaListener(topics = "approve-claim-request", groupId = "donation-group")
+    @KafkaListener(topics = "approve-claim-request", groupId = "user-service-group")
     public void handleClaimApproval(ClaimRequestDTO claimRequestDTO){
         ClaimRequestData claimRequestData=new ClaimRequestData();
         claimRequestData.setId(claimRequestDTO.getId());

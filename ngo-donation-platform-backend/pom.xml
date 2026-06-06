@@ -21,6 +21,7 @@
     <java.version>17</java.version>
     <lombok.version>1.18.30</lombok.version>
     <postgresql.version>42.7.3</postgresql.version>
+    <jjwt.version>0.12.5</jjwt.version>
   </properties>
 
   <!-- ✅ Manage only external dependency versions -->
@@ -50,10 +51,32 @@
         <optional>true</optional>
       </dependency>
 
+      <dependency>
+        <groupId>com.ngo</groupId>
+        <artifactId>security-common</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.jsonwebtoken</groupId>
+        <artifactId>jjwt-api</artifactId>
+        <version>${jjwt.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.jsonwebtoken</groupId>
+        <artifactId>jjwt-impl</artifactId>
+        <version>${jjwt.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.jsonwebtoken</groupId>
+        <artifactId>jjwt-jackson</artifactId>
+        <version>${jjwt.version}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
   <modules>
+    <module>security-common</module>
     <module>user-service</module>
     <module>donation-service</module>
     <module>ngo-service</module>

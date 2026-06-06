@@ -1,5 +1,6 @@
 package com.service;
 
+import com.dto.ClaimRequestDTO;
 import com.entity.NGO;
 import com.entity.NGOStatus;
 import com.exceptions.EntityNotFoundException;
@@ -16,7 +17,7 @@ public class NGOEventListener {
         this.ngoRepository=ngoRepository;
         this.ngoService=ngoService;
     }
-    @KafkaListener(topics = "ngo-status-events", groupId = "donation-group")
+    @KafkaListener(topics = "ngo-status-events", groupId = "ngo-service-group")
     public void listen(String message) {
         // message = "APPROVED:123"
         String[] parts = message.split(":");
@@ -40,10 +41,15 @@ public class NGOEventListener {
         //send email
     }
 
-    @KafkaListener(topics = "ngo-delete-rejected", groupId = "donation-group")
+    @KafkaListener(topics = "ngo-delete-rejected", groupId = "ngo-service-group")
     public void handleApproveNGO(Long ngoId) {
         System.out.println("NGO deletion rejected for id: " + ngoId);
         //send email
+    }
+    @KafkaListener(topics = "claim-accepted-event", groupId = "ngo-service-group")
+    public void handleApprovedClaim(ClaimRequestDTO claimRequestDTO) {
+
+
     }
 
 

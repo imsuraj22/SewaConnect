@@ -2,7 +2,6 @@ package com.controller;
 
 import com.dto.UserDTO;
 import com.entity.Role;
-import com.entity.User;
 import com.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +20,16 @@ public class UserInternalController {
     public List<UserDTO> getAllUsers() {
         return userService.getAllUsers();
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<UserDTO> getUserById(@PathVariable Long id) {
+        UserDTO dto = userService.getUserById(id);
+        if (dto == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(dto);
+    }
+
     @GetMapping("/by-role/{role}")
     public ResponseEntity<List<UserDTO>> getUsersByRole(@PathVariable Role role) {
         return ResponseEntity.ok(userService.getUsersByRole(role));

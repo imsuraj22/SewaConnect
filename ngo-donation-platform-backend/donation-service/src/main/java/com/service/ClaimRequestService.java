@@ -4,7 +4,6 @@ import com.entity.ClaimRequest;
 import com.entity.DonationStatus;
 import com.exceptions.EntityNotFoundException;
 import com.repository.ClaimRequestRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -99,10 +98,27 @@ public class ClaimRequestService {
         if(cl.isPresent()){
             ClaimRequest claimRequest=cl.get();
             long did=claimRequest.getDonationId();
-            donationService.setDonationStatus(id,DonationStatus.ACCEPTED);
+            donationService.setDonationStatus(did,DonationStatus.ACCEPTED);
+
+            rejectClaim(claimRequest.getDonationId(),claimRequest.getId());
 
         }
 
+
+
+    }
+    public void rejectClaim(Long donationId, Long approvedClaim){
+        List<ClaimRequest> claims=claimRequestRepository.findByDonationId(donationId);
+        for(ClaimRequest claim:claims){
+            if(claim.getId()!=approvedClaim){
+                claim.setStatus(DonationStatus.NOT_AVAILABLE);
+                claimRequestRepository.save(claim);
+            }
+        }
+    }
+    public ClaimRequest getClaimById(Long id) throws EntityNotFoundException {
+        return claimRequestRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("ClaimRequest with id " + id + " not found"));
     }
 
 }

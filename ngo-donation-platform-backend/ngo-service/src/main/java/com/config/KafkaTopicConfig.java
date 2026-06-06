@@ -30,4 +30,12 @@ public class KafkaTopicConfig {
                 .replicas(1)
                 .build();
     }
+
+    @Bean
+    public NewTopic claimCreateRequestTopic() {
+        return TopicBuilder.name("claim-create-request")
+                .partitions(1)
+                .replicas(1)
+                .build();
+    }
 }

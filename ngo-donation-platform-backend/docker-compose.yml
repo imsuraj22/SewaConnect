@@ -1,5 +1,20 @@
-
+# Optional: copy .env.example to .env (POSTGRES_PASSWORD, POSTGRES_PUBLISH_PORT).
+# After changing ports:  docker compose down   then   docker compose up -d
 services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: ngo-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: postgres
+    ports:
+      - "${POSTGRES_PUBLISH_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+
   zookeeper:
     image: wurstmeister/zookeeper
     container_name: zookeeper
@@ -18,3 +33,6 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
     depends_on:
       - zookeeper
+
+volumes:
+  postgres_data:

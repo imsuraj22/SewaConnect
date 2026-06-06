@@ -1,5 +1,6 @@
 package com.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -23,6 +24,7 @@ public class DonationImage {
         return id;
     }
 
+    @JsonIgnore
     public byte[] getImageData() {
         return imageData;
     }
@@ -31,6 +33,7 @@ public class DonationImage {
         this.imageData = imageData;
     }
 
+    @JsonIgnore
     public Donation getDonation() {
         return donation;
     }

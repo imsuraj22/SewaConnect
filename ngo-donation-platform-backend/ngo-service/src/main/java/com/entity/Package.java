@@ -3,6 +3,7 @@ package com.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -27,11 +28,10 @@ public class Package {
     // Each package can have multiple items
     @ElementCollection
     @CollectionTable(name = "package_items", joinColumns = @JoinColumn(name = "package_id"))
-    private List<PackageItem> items;
+    private List<PackageItem> items = new ArrayList<>();
 
-    // Each package can have multiple images
     @OneToMany(mappedBy = "pkg", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PackageImage> images;
+    private List<PackageImage> images = new ArrayList<>();
 
     private LocalDate createdAt;
     private LocalDate updatedAt;

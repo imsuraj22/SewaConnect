@@ -8,8 +8,8 @@ import org.springframework.kafka.config.TopicBuilder;
 @Configuration
 public class KafkaTopicConfig {
     @Bean
-    public NewTopic createClaimRequestTopic() {
-        return TopicBuilder.name("create-claim-request")
+    public NewTopic claimCreateRequestTopic() {
+        return TopicBuilder.name("claim-create-request")
                 .partitions(1)
                 .replicas(1)
                 .build();

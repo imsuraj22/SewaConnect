@@ -1,6 +1,9 @@
 package com.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(name = "package_images")
@@ -10,9 +13,9 @@ public class PackageImage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Lob
-    @Column(nullable = false)
-    private byte[] image;  // BLOB image storage
+    @JdbcTypeCode(SqlTypes.VARBINARY)
+    @Column(name = "image", nullable = false, columnDefinition = "bytea")
+    private byte[] image;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "package_id", nullable = false)
@@ -27,6 +30,7 @@ public class PackageImage {
         this.id = id;
     }
 
+    @JsonIgnore
     public byte[] getImage() {
         return image;
     }

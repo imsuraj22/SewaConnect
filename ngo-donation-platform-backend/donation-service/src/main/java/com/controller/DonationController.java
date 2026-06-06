@@ -4,7 +4,6 @@ import com.entity.Donation;
 import com.entity.DonationStatus;
 import com.exceptions.EntityNotFoundException;
 import com.service.DonationService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,16 +13,19 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/donations")
-@RequiredArgsConstructor
 public class DonationController {
 
     private final DonationService donationService;
+
+    public DonationController(DonationService donationService) {
+        this.donationService = donationService;
+    }
 
     // --- Create Donation ---
     @PostMapping()
     public ResponseEntity<Donation> createDonation(
             @RequestPart("donation") Donation donation,
-            @RequestPart("images") MultipartFile[] images) throws IOException {
+            @RequestPart(value = "images", required = false) MultipartFile[] images) throws IOException {
 
         Donation savedDonation = donationService.createDonation(donation, images);
         return ResponseEntity.ok(savedDonation);

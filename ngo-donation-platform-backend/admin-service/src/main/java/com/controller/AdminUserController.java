@@ -16,11 +16,12 @@ public class AdminUserController {
     }
 
     @GetMapping("/by-role/{role}")
-    public List<UserDTO> getUserByRole(String role) {
+    public List<UserDTO> getUserByRole(@PathVariable String role) {
         return adminUserService.getUserByRole(role);
     }
+
     @GetMapping("/{id}")
-    public UserDTO getUserById(Long id) {
+    public UserDTO getUserById(@PathVariable Long id) {
         return adminUserService.getUserById(id);
     }
 

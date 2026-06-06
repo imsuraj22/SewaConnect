@@ -19,5 +19,7 @@ public interface NGORepository extends JpaRepository<NGO,Long> {
     // 🔹 Search / discover NGOs
     List<NGO> findByNameContainingIgnoreCase(String name);
     List<NGO> findByAddressContainingIgnoreCase(String address);
-    List<NGO>  findByStatus(NGOStatus status);
+    List<NGO> findByStatus(NGOStatus status);
+
+    Optional<NGO> findByUserId(Long userId);
 }
