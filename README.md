@@ -11,7 +11,7 @@ A microservices-based platform that connects **donors** and **NGOs**, making it 
 Below is the demo video link for SewaConnect covering registration, NGO workspace, admin approval, and donation flow.
 
 🎥 Demo Video:
-https://drive.google.com/file/d/1A81A95WYQ8qMDx2n2TdT5RXBaRtVBasx/view?usp=sharing
+https://drive.google.com/file/d/1hoBrr4w2ntdrk8Q6h1zC7IbMDadSrooU/view?usp=sharing
 
 
 
